@@ -1,9 +1,14 @@
 package be.juvo.paul;
 
+import be.juvo.paul.forms.GreeterForm;
+import be.juvo.paul.forms.ProductForm;
+import be.juvo.paul.forms.ToDoForm;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A sample Vaadin view class.
@@ -26,18 +31,22 @@ import com.vaadin.flow.server.PWA;
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 public class MainView extends VerticalLayout {
 
+    @Autowired
+    private GreeterForm greeterForm;
+
     /**
      * Construct a new Vaadin view.
      * <p>
      * Build the initial UI state for the user accessing the application.
      */
-    public MainView() {
+    public MainView(GreeterForm greeterForm) {
+        this.greeterForm = greeterForm;
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(new ProductForm(), new ToDoForm());
 
-        add(new GreeterForm(new GreetService()));
+        add(greeterForm, horizontalLayout);
 
-        add(new ProductForm());
 
-        add(new ToDoForm());
     }
 
 }

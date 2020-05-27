@@ -1,4 +1,4 @@
-package be.juvo.paul;
+package be.juvo.paul.forms;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
