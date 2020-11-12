@@ -1,7 +1,7 @@
-package be.juvo.paul.services;
+package be.juvo.paul.formpractice.services;
 
-import be.juvo.paul.entities.User;
-import be.juvo.paul.repositories.UserRepository;
+import be.juvo.paul.formpractice.entities.User;
+import be.juvo.paul.formpractice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,11 +1,10 @@
-package be.juvo.paul.forms;
+package be.juvo.paul.formpractice.forms;
 
-import be.juvo.paul.GreetService;
-import be.juvo.paul.services.UserServiceImpl;
+import be.juvo.paul.formpractice.GreetService;
+import be.juvo.paul.formpractice.services.UserServiceImpl;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class GreeterForm extends VerticalLayout {
         // Button click listeners can be defined as lambda expressions
         Button button = new Button("Say hello",
                 e -> {
-                    Notification.show(service.greet(textField.getValue()));
+                    //Notification.show(service.greet(textField.getValue()));
                     userService.saveUser(textField.getValue());
                     System.out.println(userService.findAll());  // database works, but tables don't show
                 });

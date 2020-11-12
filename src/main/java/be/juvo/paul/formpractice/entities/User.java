@@ -1,4 +1,4 @@
-package be.juvo.paul.entities;
+package be.juvo.paul.formpractice.entities;
 
 import lombok.*;
 

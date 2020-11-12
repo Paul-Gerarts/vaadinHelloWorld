@@ -1,13 +1,7 @@
-package be.juvo.paul;
+package be.juvo.paul.formpractice;
 
-import be.juvo.paul.forms.GreeterForm;
-import be.juvo.paul.forms.ProductForm;
-import be.juvo.paul.forms.ToDoForm;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import be.juvo.paul.formpractice.forms.GreeterForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,13 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * A new instance of this class is created for every new user and every
  * browser tab/window.
  */
-@Route
-@PWA(name = "Vaadin Application",
-        shortName = "Vaadin App",
-        description = "This is an example Vaadin application.",
-        enableInstallPrompt = false)
-@CssImport("./styles/shared-styles.css")
-@CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
+//@Route
+//@PWA(name = "Vaadin Application",
+//        shortName = "Vaadin App",
+//        description = "This is an example Vaadin application.",
+//        enableInstallPrompt = false)
+//@CssImport("./styles/shared-styles.css")
+//@CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 public class MainView extends VerticalLayout {
 
     @Autowired
@@ -41,12 +35,10 @@ public class MainView extends VerticalLayout {
      */
     public MainView(GreeterForm greeterForm) {
         this.greeterForm = greeterForm;
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(new ProductForm(), new ToDoForm());
-
-        add(greeterForm, horizontalLayout);
-
-
+//        HorizontalLayout horizontalLayout = new HorizontalLayout();
+//        horizontalLayout.add(new ProductForm(), new ToDoForm());
+//
+//        add(greeterForm, horizontalLayout);
     }
 
 }

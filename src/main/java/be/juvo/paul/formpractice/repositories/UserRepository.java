@@ -1,6 +1,6 @@
-package be.juvo.paul.repositories;
+package be.juvo.paul.formpractice.repositories;
 
-import be.juvo.paul.entities.User;
+import be.juvo.paul.formpractice.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
