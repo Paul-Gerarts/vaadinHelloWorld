@@ -3,6 +3,7 @@ package be.juvo.paul.battleship.forms;
 import be.juvo.paul.battleship.factories.GridBuilder;
 import be.juvo.paul.formpractice.GreetService;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -22,7 +23,8 @@ public class PlayForm extends VerticalLayout {
 
     private GreetService greetService;
     private GridBuilder gridBuilder;
-    private HorizontalLayout gamingGrid;
+    private HorizontalLayout myGrid;
+    private HorizontalLayout computerGrid;
 
     @Autowired
     public PlayForm(
@@ -36,16 +38,24 @@ public class PlayForm extends VerticalLayout {
         TextField textField = new TextField("Your name");
 
         ComboBox<String> category = new ComboBox<>("Grid size");
-        category.setItems("10");
+        category.setItems("5", "10");
 
-        Button startGame = new Button("Start game",
+        Text text = new Text("Greetings commander. The grid above is where you target the enemy's ships, the lower one's where yours are stationed. Good luck!");
+
+        Button startGame = new Button("Start new game",
                 e -> {
                     Notification.show(greetService.greet(textField.getValue(), getGridSize(category)));
-                    // grid
-                    this.gamingGrid = new HorizontalLayout();
-                    this.gamingGrid.setSpacing(false);
-                    gridBuilder.buildGrid(textField.getValue(), getGridSize(category)).forEach(grid -> this.gamingGrid.add(grid));
-                    add(this.gamingGrid);
+                    // grids
+                    this.myGrid = new HorizontalLayout();
+                    this.myGrid.setId("myGrid");
+                    this.myGrid.setSpacing(false);
+                    gridBuilder.buildGrid(textField.getValue(), getGridSize(category), true).forEach(grid -> this.myGrid.add(grid));
+                    add(this.myGrid);
+                    this.computerGrid = new HorizontalLayout();
+                    this.computerGrid.setId("computerGrid");
+                    this.computerGrid.setSpacing(false);
+                    gridBuilder.buildGrid(textField.getValue(), getGridSize(category), false).forEach(grid -> this.computerGrid.add(grid));
+                    add(this.computerGrid);
                 });
         startGame.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         startGame.addClickShortcut(Key.ENTER);
@@ -54,6 +64,7 @@ public class PlayForm extends VerticalLayout {
 
         add(initiators);
         add(startGame);
+        add(text);
     }
 
     private int getGridSize(ComboBox<String> category) {

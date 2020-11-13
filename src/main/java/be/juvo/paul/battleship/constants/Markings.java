@@ -11,8 +11,8 @@ public enum Markings {
 
     HIT("X"),
     MISS("O"),
-    BLANK(""),
-    NOT_AVAILABLE("N/A");
+    BOAT("B"),
+    BLANK("");
 
     private final String stringValue;
 }

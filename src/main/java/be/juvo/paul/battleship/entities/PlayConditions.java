@@ -17,12 +17,15 @@ public class PlayConditions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "playconditions_id")
     private Long id;
+
     @Column
     private String name;
+
     @Column
-    private int gridSize;
+    private Integer gridSize;
+
     @Column
     private Grid gamingGrid;
 }

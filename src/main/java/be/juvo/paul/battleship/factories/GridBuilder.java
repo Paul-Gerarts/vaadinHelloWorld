@@ -3,10 +3,16 @@ package be.juvo.paul.battleship.factories;
 import be.juvo.paul.battleship.entities.Coordinate;
 import be.juvo.paul.battleship.entities.PlayConditions;
 import be.juvo.paul.battleship.entities.Vector;
+import be.juvo.paul.battleship.exceptions.WinException;
+import be.juvo.paul.battleship.services.GameLogicServiceImpl;
 import be.juvo.paul.battleship.services.PlayConditionsServiceImpl;
+import be.juvo.paul.battleship.services.VectorServiceImpl;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.selection.SingleSelect;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,10 +21,10 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static be.juvo.paul.battleship.constants.Markings.*;
+import static be.juvo.paul.battleship.constants.Markings.BLANK;
+import static be.juvo.paul.battleship.constants.Markings.BOAT;
 
 @Slf4j
-@Builder
 @Getter
 @Setter
 @ToString
@@ -27,15 +33,23 @@ import static be.juvo.paul.battleship.constants.Markings.*;
 public class GridBuilder {
 
     private PlayConditionsServiceImpl playConditionsService;
+    private VectorServiceImpl vectorService;
+    private GameLogicServiceImpl gameLogicService;
+    private static final String FAIL_SAFE = "NOT AVAILABLE";
+    private List<Grid<Coordinate>> computerGrids = new ArrayList<>();
 
     @Autowired
     public GridBuilder(
-            PlayConditionsServiceImpl playConditionsService
+            PlayConditionsServiceImpl playConditionsService,
+            VectorServiceImpl vectorService,
+            GameLogicServiceImpl gameLogicService
     ) {
         this.playConditionsService = playConditionsService;
+        this.vectorService = vectorService;
+        this.gameLogicService = gameLogicService;
     }
 
-    public List<Grid<Coordinate>> buildGrid(String name, int gridSize) {
+    public List<Grid<Coordinate>> buildGrid(String name, int gridSize, boolean myGrid) {
         PlayConditions playConditions = playConditionsService.findByNameAndGridSize(name, gridSize);
 
         if (null != playConditions) {
@@ -43,25 +57,29 @@ public class GridBuilder {
             gridSize = playConditions.getGridSize();
         }
         switch (gridSize) {
-            case 0:
-                return new ArrayList<>();
+            case 5:
+                return buildGrid(gridSize,
+                        new String[]{"A", "B", "C", "D", "E"},
+                        new String[]{"row", "_1", "_2", "_3", "_4", "_5"},
+                        myGrid);
             case 10:
             default:
-                return buildGrid(gridSize
-                        , new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"}
-                        , new String[]{"row", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "_10"});
+                return buildGrid(gridSize,
+                        new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"},
+                        new String[]{"row", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "_10"},
+                        myGrid);
         }
     }
 
-    private List<Grid<Coordinate>> buildGrid(int gridSize, String[] rows, String[] headers) {
+    private List<Grid<Coordinate>> buildGrid(int gridSize, String[] rows, String[] headers, boolean myGrid) {
         List<Grid<Coordinate>> gameGrid = new LinkedList<>();
-        List<Vector> boatPositions = markBoatPositions(gridSize);
+        List<Vector> boatPositions = markBoatPositions(gridSize, myGrid);
         for (String header : headers) {
             Grid<Coordinate> grid = new Grid<>(Coordinate.class);
-            grid.setItems(getBlankGridItems(gridSize, rows, header, boatPositions));
+            grid.setItems(getGridItems(gridSize, rows, header, boatPositions, myGrid));
             grid.setColumns(header);
             grid.setWidth("120px");
-            grid.setHeight("450px");
+            grid.setHeight(gridSize == 10 ? "450px" : "250px");
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
             SingleSelect<Grid<Coordinate>, Coordinate> coordinateSelect = grid.asSingleSelect();
             grid.setColumnReorderingAllowed(false);
@@ -69,43 +87,47 @@ public class GridBuilder {
             grid.getColumns().forEach(column -> column.setSortable(false));
             coordinateSelect.addValueChangeListener(clickEvent -> {
                 try {
-                    Coordinate coordinate = clickEvent.getValue();
-                    boolean hit = boatPositions.stream().anyMatch(containsBoat(coordinate.getColumn(), coordinate.getRow()));
-                    log.info("You shot and {}. Coordinate: {}", hit ? "hit" : "missed", coordinate.toString());
-                    grid.getEditor().editItem(markAsShot(coordinate, hit));
-                    log.info("New coordinate?: {}", clickEvent.getValue().toString());
-                    grid.getDataProvider().refreshItem(coordinate);
+                    gameLogicService.executePlayerLogic(boatPositions, grid, clickEvent, true);
+                    gameLogicService.executeComputerLogic(computerGrids, false);
                 } catch (NullPointerException npe) {
-                    log.info("field already targeted! Try another one!");
+                    gameLogicService.fieldAlreadySelected();
+                } catch (WinException we) {
+                    gameLogicService.gameOver(we);
                 }
             });
             gameGrid.add(grid);
         }
+        if (!myGrid) {
+            computerGrids = gameGrid;
+        }
         return gameGrid;
     }
 
-    private List<Coordinate> getBlankGridItems(int gridSize, String[] rows, String header, List<Vector> boatPositions) {
+
+    private List<Coordinate> getGridItems(int gridSize, String[] rows, String header, List<Vector> boatPositions, boolean myGrid) {
         List<Coordinate> coordinates = new ArrayList<>();
         for (int i = 1; i <= gridSize; i++) {
             final String row = rows[i - 1];
+            final boolean containsBoat = boatPositions.stream().anyMatch(containsBoat(header, row));
+            final String marking = containsBoat && !myGrid ? BOAT.getStringValue() : BLANK.getStringValue();
             Coordinate coordinate = Coordinate.builder()
                     .row(row)
-                    ._1(BLANK.getStringValue())
-                    ._2(BLANK.getStringValue())
-                    ._3(BLANK.getStringValue())
-                    ._4(BLANK.getStringValue())
-                    ._5(BLANK.getStringValue())
-                    ._6(BLANK.getStringValue())
-                    ._7(BLANK.getStringValue())
-                    ._8(BLANK.getStringValue())
-                    ._9(BLANK.getStringValue())
-                    ._10(BLANK.getStringValue())
+                    ._1(marking)
+                    ._2(marking)
+                    ._3(marking)
+                    ._4(marking)
+                    ._5(marking)
+                    ._6(marking)
+                    ._7(marking)
+                    ._8(marking)
+                    ._9(marking)
+                    ._10(marking)
                     .designated(false)
                     .column(header)
                     .neighbouringCells(calculateNeighbouringCells(rows[i - 1], header, gridSize))
                     .build();
 
-            if (boatPositions.stream().anyMatch(containsBoat(header, row))) {
+            if (containsBoat) {
                 coordinate.setContainsBoat(true);
             }
             coordinates.add(coordinate);
@@ -189,68 +211,41 @@ public class GridBuilder {
         return neighbouringCells;
     }
 
-    private String fillCoordinate(int columnToFill, int currentColumn) {
-        return columnToFill == currentColumn ? HIT.getStringValue() : NOT_AVAILABLE.getStringValue();
-    }
-
-    private Coordinate markAsShot(Coordinate coordinate, boolean hit) {
-        String column = coordinate.getColumn().substring(1);
-        String marking = hit ? HIT.getStringValue() : MISS.getStringValue();
-        switch (column) {
-            case "1":
-                coordinate.set_1(marking);
-                break;
-            case "2":
-                coordinate.set_2(marking);
-                break;
-            case "3":
-                coordinate.set_3(marking);
-                break;
-            case "4":
-                coordinate.set_4(marking);
-                break;
-            case "5":
-                coordinate.set_5(marking);
-                break;
-            case "6":
-                coordinate.set_6(marking);
-                break;
-            case "7":
-                coordinate.set_7(marking);
-                break;
-            case "8":
-                coordinate.set_8(marking);
-                break;
-            case "9":
-                coordinate.set_9(marking);
-                break;
-            case "10":
-                coordinate.set_10(marking);
+    private List<Vector> markBoatPositions(int gridSize, boolean myBoats) {
+        List<Vector> boatPositions = new ArrayList<>();
+        int amountOfVectors = 0;
+        switch (gridSize) {
+            case 10:
+                boatPositions.addAll(createAndSaveBoat(gridSize, 5, boatPositions, "Battleship", myBoats));
+                boatPositions.addAll(createAndSaveBoat(gridSize, 4, boatPositions, "Cruiser", myBoats));
+                amountOfVectors = amountOfVectors + 9;
+            case 5:
+                boatPositions.addAll(createAndSaveBoat(gridSize, 3, boatPositions, "Minesweeper", myBoats));
+                boatPositions.addAll(createAndSaveBoat(gridSize, 3, boatPositions, "Submarine", myBoats));
+                boatPositions.addAll(createAndSaveBoat(gridSize, 2, boatPositions, "Patrolboat", myBoats));
+                amountOfVectors = amountOfVectors + 8;
                 break;
             default:
         }
-        coordinate.setDesignated(true);
-        return coordinate;
-    }
-
-    private List<Vector> markBoatPositions(int gridSize) {
-        List<Vector> boatPositions = new ArrayList<>();
-        switch (gridSize) {
-            case 10:
-                boatPositions.addAll(randomizeBoats(4, gridSize));
-                boatPositions.addAll(randomizeBoats(5, gridSize));
-            case 5:
-                boatPositions.addAll(randomizeBoats(2, gridSize));
-                boatPositions.addAll(randomizeBoats(3, gridSize));
-                boatPositions.addAll(randomizeBoats(3, gridSize));
-                break;
-            default:
+        if (boatPositions.size() != amountOfVectors) {
+            vectorService.deleteAll();
+            return markBoatPositions(gridSize, myBoats);
         }
         return boatPositions;
     }
 
-    private List<Vector> randomizeBoats(int boatSize, int gridSize) {
-        // TODO make sure boats don't overlap. Ensure correct count. Perhaps cluster the boats for future hit-notification
+    private List<Vector> createAndSaveBoat(int gridSize, int boatSize, List<Vector> boatPositions, String name, boolean myBoats) {
+        List<Vector> individualBoatPositions;
+        individualBoatPositions = randomizeBoats(boatSize, gridSize, boatPositions);
+        individualBoatPositions.forEach(vector -> {
+            vector.setMyBoats(myBoats);
+            vector.setBoatName(name);
+            vectorService.save(vector);
+        });
+        return individualBoatPositions;
+    }
+
+    private List<Vector> randomizeBoats(int boatSize, int gridSize, List<Vector> definedBoatPositions) {
         List<Vector> boatPositions = new ArrayList<>();
         int randomColumnStart;
         Random random = new Random();
@@ -292,6 +287,7 @@ public class GridBuilder {
                             .build());
                 }
                 break;
+            // RIGHT
             case 4:
                 randomColumnStart = (random.nextInt(boatSize) + 1);
                 randomRow = (char) (65 + random.nextInt(gridSize));
@@ -303,6 +299,12 @@ public class GridBuilder {
                 }
                 break;
             default:
+        }
+        for (Vector position : boatPositions) {
+            boolean overLap = definedBoatPositions.stream().anyMatch(containsBoat("_" + position.getColumn(), position.getRow()));
+            if (overLap) {
+                return randomizeBoats(boatSize, gridSize, definedBoatPositions);
+            }
         }
         return boatPositions;
     }
