@@ -7,9 +7,10 @@ import java.util.List;
 
 public interface VectorRepository extends JpaRepository<Vector, Long> {
 
-    List<Vector> findAllByMyBoatsAndHit(boolean myBoats, boolean hit);
+    List<Vector> findAllByMyBoatsAndHitAndContainsBoat(boolean myBoats, boolean hit, boolean containsBoat);
+
+    List<Vector> findAllByMyBoatsAndContainsBoat(boolean myBoats, boolean containsBoat);
 
     List<Vector> findAllByMyBoatsAndBoatNameAndHitIsFalse(boolean myBoats, String boatName);
 
-    List<Vector> findAllByMyBoats(boolean myBoats);
 }

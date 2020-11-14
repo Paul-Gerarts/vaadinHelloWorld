@@ -34,7 +34,7 @@ public class GreeterForm extends VerticalLayout {
         // Button click listeners can be defined as lambda expressions
         Button button = new Button("Say hello",
                 e -> {
-                    //Notification.show(service.greet(textField.getValue()));
+                    //Notification.show(service.greet(textField.getValue())).setPosition(Notification.Position.BOTTOM_END);
                     userService.saveUser(textField.getValue());
                     System.out.println(userService.findAll());  // database works, but tables don't show
                 });

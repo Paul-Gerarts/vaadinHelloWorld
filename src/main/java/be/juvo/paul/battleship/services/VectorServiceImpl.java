@@ -26,15 +26,15 @@ public class VectorServiceImpl {
     }
 
     public List<Vector> findAllUnsunkBoats(boolean myBoats) {
-        return vectorRepository.findAllByMyBoatsAndHit(myBoats, false);
+        return vectorRepository.findAllByMyBoatsAndHitAndContainsBoat(myBoats, false, true);
     }
 
     public List<Vector> findAllUnsunkBoatsByName(boolean myBoats, String boatName) {
         return vectorRepository.findAllByMyBoatsAndBoatNameAndHitIsFalse(myBoats, boatName);
     }
 
-    public List<Vector> findAllByMyBoats(boolean myBoats) {
-        return vectorRepository.findAllByMyBoats(myBoats);
+    public List<Vector> findAllByMyBoatsAndContainsBoat(boolean myBoats, boolean containsBoat) {
+        return vectorRepository.findAllByMyBoatsAndContainsBoat(myBoats, containsBoat);
     }
 
     public void deleteAll() {

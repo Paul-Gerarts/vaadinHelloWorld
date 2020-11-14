@@ -24,6 +24,10 @@ public class PlayConditionsServiceImpl {
                 .build());
     }
 
+    public void deleteAll() {
+        playConditionsRepository.deleteAll();
+    }
+
     public PlayConditions findByNameAndGridSize(String name, int gridSize) {
         return playConditionsRepository.findByNameAndGridSize(name, gridSize).orElse(null);
     }

@@ -27,10 +27,13 @@ public class Vector {
     private Integer column;
 
     @Column
-    private boolean hit;
+    private Boolean hit;
 
     @Column
-    private boolean myBoats;
+    private Boolean myBoats;
+
+    @Column
+    private Boolean containsBoat;
 
     @Column
     private String boatName;

@@ -44,7 +44,7 @@ public class PlayForm extends VerticalLayout {
 
         Button startGame = new Button("Start new game",
                 e -> {
-                    Notification.show(greetService.greet(textField.getValue(), getGridSize(category)));
+                    Notification.show(greetService.greet(textField.getValue(), getGridSize(category))).setPosition(Notification.Position.BOTTOM_END);
                     // grids
                     this.myGrid = new HorizontalLayout();
                     this.myGrid.setId("myGrid");

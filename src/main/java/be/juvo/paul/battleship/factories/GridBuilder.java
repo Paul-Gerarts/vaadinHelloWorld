@@ -87,8 +87,8 @@ public class GridBuilder {
             grid.getColumns().forEach(column -> column.setSortable(false));
             coordinateSelect.addValueChangeListener(clickEvent -> {
                 try {
-                    gameLogicService.executePlayerLogic(boatPositions, grid, clickEvent, true);
-                    gameLogicService.executeComputerLogic(computerGrids, false);
+                    gameLogicService.executePlayerLogic(boatPositions, grid, clickEvent);
+                    gameLogicService.executeComputerLogic(computerGrids);
                 } catch (NullPointerException npe) {
                     gameLogicService.fieldAlreadySelected();
                 } catch (WinException we) {
@@ -126,6 +126,21 @@ public class GridBuilder {
                     .column(header)
                     .neighbouringCells(calculateNeighbouringCells(rows[i - 1], header, gridSize))
                     .build();
+
+            if (!header.equals("row")) {
+                Vector vector = Vector.builder()
+                        .row(row)
+                        .column(Integer.parseInt(header.substring(1)))
+                        .hit(false)
+                        .myBoats(myGrid)
+                        .containsBoat(containsBoat)
+                        .build();
+                List<Vector> singleBoat = boatPositions.stream().filter(containsBoat(header, row)).distinct().collect(Collectors.toList());
+                if (!singleBoat.isEmpty()) {
+                    vector.setBoatName(singleBoat.get(0).getBoatName());
+                }
+                vectorService.save(vector);
+            }
 
             if (containsBoat) {
                 coordinate.setContainsBoat(true);
@@ -182,7 +197,7 @@ public class GridBuilder {
     }
 
     private Predicate<Vector> filterOutInvalidVectors(int gridSize) {
-        return vector -> null != vector.getRow() || vector.getColumn() < 1 || vector.getColumn() > gridSize;
+        return vector -> null != vector.getRow() || (vector.getColumn() < 1 && vector.getColumn() <= gridSize);
     }
 
     private Vector[] calculateNeighbouringVectors(String rowAbove, String rowBelow, String currentRow, int column) {
@@ -192,21 +207,25 @@ public class GridBuilder {
         neighbouringCells[index++] = Vector.builder()
                 .row(rowAbove)
                 .column(column)
+                .hit(false)
                 .build();
         // below
         neighbouringCells[index++] = Vector.builder()
                 .row(rowBelow)
                 .column(column)
+                .hit(false)
                 .build();
         // left
         neighbouringCells[index++] = Vector.builder()
                 .row(currentRow)
                 .column(column - 1)
+                .hit(false)
                 .build();
         // right
         neighbouringCells[index] = Vector.builder()
                 .row(currentRow)
                 .column(column + 1)
+                .hit(false)
                 .build();
         return neighbouringCells;
     }
@@ -240,7 +259,6 @@ public class GridBuilder {
         individualBoatPositions.forEach(vector -> {
             vector.setMyBoats(myBoats);
             vector.setBoatName(name);
-            vectorService.save(vector);
         });
         return individualBoatPositions;
     }
