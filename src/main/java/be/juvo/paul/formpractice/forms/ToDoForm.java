@@ -1,6 +1,5 @@
 package be.juvo.paul.formpractice.forms;
 
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.H1;
@@ -14,7 +13,8 @@ public class ToDoForm extends VerticalLayout {
         VerticalLayout todoList = new VerticalLayout();
         TextField taskField = new TextField();
         Button addButton = new Button("Add");
-        addButton.addClickShortcut(Key.ENTER);
+        // commented the next line out because of multiple clickShortCuts - this one threw exception because the underlaying save to the database (restraint-validation)
+        // addButton.addClickShortcut(Key.ENTER);
         addButton.addClickListener(click -> {
             Checkbox checkbox = new Checkbox(taskField.getValue());
             todoList.add(checkbox);

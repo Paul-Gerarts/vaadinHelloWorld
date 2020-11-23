@@ -1,6 +1,6 @@
 package be.juvo.paul.formpractice.forms;
 
-import com.vaadin.flow.component.Key;
+import be.juvo.paul.formpractice.customfields.CustomDateTimePicker;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -52,26 +52,18 @@ public class ProductForm extends VerticalLayout {
 
         NumberField dollarField = new NumberField("Dollars");
         dollarField.setPrefixComponent(new Span("$"));
-        dollarField.addKeyPressListener(event -> {
-            if (event.getKey() == Key.ENTER) {
-                log.info("fieldValue = {}", dollarField.getValue());
-            }
-        });
+        dollarField.addValueChangeListener(event -> log.info("dollerFieldValue = {}", dollarField.getValue()));
 
         NumberField euroField = new NumberField("Euros");
         euroField.setSuffixComponent(new Span("€"));
-        euroField.addKeyPressListener(event -> {
-            if (event.getKey() == Key.ENTER) {
-                log.info("fieldValue = {}", dollarField.getValue());
-            }
-        });
+        euroField.addValueChangeListener(event -> log.info("euroFieldValue = {}", euroField.getValue()));
 
         NumberField stepperField = new NumberField("Stepper");
         stepperField.setValue(1d);
         stepperField.setMin(0);
         stepperField.setMax(10);
         stepperField.setHasControls(true);
-        stepperField.addValueChangeListener(event -> log.info("fieldValue = {}", dollarField.getValue()));
+        stepperField.addValueChangeListener(event -> log.info("stepperFieldValue = {}", stepperField.getValue()));
 
         PasswordField passwordField = new PasswordField();
         passwordField.setLabel("Password");
@@ -81,7 +73,9 @@ public class ProductForm extends VerticalLayout {
 
         Checkbox checkbox = new Checkbox();
         checkbox.setLabel("My CHECKBOX");
+        checkbox.setWidth("200px");
 
+        // how to style these (width, height... flex?)
         RadioButtonGroup<String> group = new RadioButtonGroup<>();
         group.setItems("foo", "bar", "fooBar");
         group.addValueChangeListener(event -> log.info("Value changed from '{}' to '{}'", event.getOldValue(), event.getValue()));
@@ -89,8 +83,9 @@ public class ProductForm extends VerticalLayout {
         // selects a single option
         ListBox<String> listBox = new ListBox<>();
         listBox.setItems("this", "is", "a", "listBox");
+        // de-selecting a value possible? Keeps showing the checkMark once a value is selected
 
-        Select<String> select = new Select<>("one", "two");
+        Select<String> select = new Select<>("", "one", "two");
         select.setPlaceholder("Select-option");
         select.setLabel("select");
 
@@ -117,5 +112,8 @@ public class ProductForm extends VerticalLayout {
             // Component component = createComponent(event.getMIMEType(), event.getFileName(), buffer.getInputStream());
             // showOutput(event.getFileName(), component, output);
         });
+
+        HorizontalLayout customDateTimePicker = new HorizontalLayout(new CustomDateTimePicker());
+        add(customDateTimePicker);
     }
 }

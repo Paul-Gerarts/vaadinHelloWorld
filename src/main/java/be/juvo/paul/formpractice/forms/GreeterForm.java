@@ -3,15 +3,16 @@ package be.juvo.paul.formpractice.forms;
 import be.juvo.paul.formpractice.GreetService;
 import be.juvo.paul.formpractice.customcomponents.MyLabel;
 import be.juvo.paul.formpractice.services.UserServiceImpl;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class GreeterForm extends VerticalLayout {
 
@@ -42,7 +43,9 @@ public class GreeterForm extends VerticalLayout {
                 e -> {
                     Notification.show(service.showName(textField.getValue())).setPosition(Notification.Position.BOTTOM_END);
                     userService.saveUser(textField.getValue());
-                    System.out.println(userService.findAll());  // database works, but tables don't show
+                    userService.findAll().forEach(user -> {
+                        log.info("userName: {}", user.getFirstName());  // database works, but tables don't show
+                    });
                 });
 
         // Theme variants give you predefined extra styles for components.
@@ -51,7 +54,7 @@ public class GreeterForm extends VerticalLayout {
 
         // You can specify keyboard shortcuts for buttons.
         // Example: Pressing enter in this view clicks the Button.
-        button.addClickShortcut(Key.ENTER);
+        // button.addClickShortcut(Key.ENTER);
 
         // Use custom CSS classes to apply styling. This is defined in shared-styles.css.
         addClassName("centered-content");
