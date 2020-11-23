@@ -8,7 +8,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Route
+@Route()
 @PWA(name = "Vaadin Application",
         shortName = "Vaadin App",
         description = "This is a batteship application intended for practicing Vaadin 14.",

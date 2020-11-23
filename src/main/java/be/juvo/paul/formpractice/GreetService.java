@@ -32,6 +32,10 @@ public class GreetService implements Serializable {
         this.computerShotService = computerShotService;
     }
 
+    public String showName(String name) {
+        return name;
+    }
+
     public String greet(String name, int gridSize) {
         // PlayConditions playConditions = playConditionsService.findByNameAndGridSize(name, gridSize);
 

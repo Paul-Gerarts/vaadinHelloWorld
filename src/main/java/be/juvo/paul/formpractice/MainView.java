@@ -1,7 +1,11 @@
 package be.juvo.paul.formpractice;
 
 import be.juvo.paul.formpractice.forms.GreeterForm;
+import be.juvo.paul.formpractice.forms.ProductForm;
+import be.juvo.paul.formpractice.forms.ToDoForm;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -16,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * A new instance of this class is created for every new user and every
  * browser tab/window.
  */
-//@Route
+@Route("form_practice")
 //@PWA(name = "Vaadin Application",
 //        shortName = "Vaadin App",
 //        description = "This is an example Vaadin application.",
@@ -35,10 +39,10 @@ public class MainView extends VerticalLayout {
      */
     public MainView(GreeterForm greeterForm) {
         this.greeterForm = greeterForm;
-//        HorizontalLayout horizontalLayout = new HorizontalLayout();
-//        horizontalLayout.add(new ProductForm(), new ToDoForm());
-//
-//        add(greeterForm, horizontalLayout);
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(new ProductForm(), new ToDoForm());
+
+        add(greeterForm, horizontalLayout);
     }
 
 }
