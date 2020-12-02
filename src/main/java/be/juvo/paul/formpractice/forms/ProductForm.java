@@ -1,11 +1,14 @@
 package be.juvo.paul.formpractice.forms;
 
+import be.juvo.paul.formpractice.customcomponents.CustomAccordion;
 import be.juvo.paul.formpractice.customfields.CustomDateTimePicker;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -115,5 +118,16 @@ public class ProductForm extends VerticalLayout {
 
         HorizontalLayout customDateTimePicker = new HorizontalLayout(new CustomDateTimePicker());
         add(customDateTimePicker);
+
+        CustomAccordion customAccordion = new CustomAccordion();
+        HorizontalLayout accordion = new HorizontalLayout(customAccordion.getAccordion());
+        add(accordion);
+
+        Dialog popUp = new Dialog();
+        popUp.add(new Label("Close me with the esc-key or an outside click"));
+        popUp.setWidth("400px");
+        popUp.setHeight("150px");
+        save.addClickListener(event -> popUp.open());
+
     }
 }
