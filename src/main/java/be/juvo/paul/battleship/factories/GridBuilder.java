@@ -8,6 +8,8 @@ import be.juvo.paul.battleship.services.GameLogicServiceImpl;
 import be.juvo.paul.battleship.services.PlayConditionsServiceImpl;
 import be.juvo.paul.battleship.services.VectorServiceImpl;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.data.selection.SingleSelect;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,20 +73,24 @@ public class GridBuilder {
         }
     }
 
+    /*
+     * see the Vaadin book at page 49 -> also Tree Grid for hierarchical structures
+     */
     private List<Grid<Coordinate>> buildGrid(int gridSize, String[] rows, String[] headers, boolean myGrid) {
         List<Grid<Coordinate>> gameGrid = new LinkedList<>();
         List<Vector> boatPositions = markBoatPositions(gridSize, myGrid);
         for (String header : headers) {
-            Grid<Coordinate> grid = new Grid<>(Coordinate.class);
+            Grid<Coordinate> grid = new Grid<>(Coordinate.class); // this automatically sets the property names as column keys
             grid.setItems(getGridItems(gridSize, rows, header, boatPositions, myGrid));
             grid.setColumns(header);
             grid.setWidth("120px");
             grid.setHeight(gridSize == 10 ? "450px" : "250px");
             grid.setSelectionMode(Grid.SelectionMode.SINGLE);
             SingleSelect<Grid<Coordinate>, Coordinate> coordinateSelect = grid.asSingleSelect();
-            grid.setColumnReorderingAllowed(false);
+            grid.setColumnReorderingAllowed(false); // default is false
             grid.setMultiSort(false);
             grid.getColumns().forEach(column -> column.setSortable(false));
+            // == grid.setSortableColumns(); when no param -> column excluded and thus not sortable
             coordinateSelect.addValueChangeListener(clickEvent -> {
                 try {
                     gameLogicService.executePlayerLogic(boatPositions, grid, clickEvent);
@@ -325,5 +331,42 @@ public class GridBuilder {
             }
         }
         return boatPositions;
+    }
+
+    private void configureColumn(Grid<Coordinate> grid) {
+        Grid.Column<Coordinate> column = grid
+                .addColumn(Coordinate::get_1)
+                .setHeader("1")
+                .setFlexGrow(0)
+                .setWidth("100px")
+                .setResizable(false)
+                .setKey("identifierForQuickRetrievalThrough_getColumnByKey(String name)");
+        column.setVisible(false); // still holds it data when other columns are filled. Better to remove, or don't add for starters
+        column.setFrozen(true); // will remain in place and visible when the user scrolls horizontally
+    }
+
+    private void setColumnsManually() {
+        try {
+            Grid<Coordinate> grid = new Grid<>(Coordinate.class, false);
+            grid.addColumn(coordinate -> coordinate.getRow().split(" ")[0])
+                    .setHeader("Row");
+            grid.addColumns("designated", "containsBoat");
+        } catch (IllegalArgumentException iae) {
+            log.warn("You tried to add a column that's already present in the grid");
+        }
+    }
+
+    /*
+     * Look into Renderers p.73 --most interesting IMHO: ComponentRenderer p. 80--
+     */
+    private void groupColumns(Grid<Coordinate> grid) {
+        // Create a header row
+        HeaderRow topRow = grid.prependHeaderRow();
+        // group two columns under the same label
+        topRow.join(grid.getColumnByKey("identifier1"), grid.getColumnByKey("identifier2"))
+                .setComponent(new Label("Basic Information"));
+        // group the other two columns in the same header row
+        topRow.join(grid.getColumnByKey("identifier3"), grid.getColumnByKey("identifier4"))
+                .setComponent(new Label("Address Information"));
     }
 }

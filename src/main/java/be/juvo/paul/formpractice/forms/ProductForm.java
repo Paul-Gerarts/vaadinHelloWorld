@@ -10,11 +10,18 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
+import com.vaadin.flow.component.login.AbstractLogin;
+import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -129,5 +136,35 @@ public class ProductForm extends VerticalLayout {
         popUp.setHeight("150px");
         save.addClickListener(event -> popUp.open());
 
+        // programmatically update the value
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.setValue(0.345);
+        add(progressBar);
+
+        Tab tab1 = new Tab("Tab one");
+        Tab tab2 = new Tab("Tab two");
+        Tab tab3 = new Tab("Tab three");
+        Tabs tabs = new Tabs(tab1, tab2, tab3);
+        add(tabs);
+
+        // two options of initializing
+        Icon edit = new Icon(VaadinIcon.EDIT);
+        Icon close = VaadinIcon.CLOSE.create();
+        add(edit, close);
+
+        LoginForm component = new LoginForm();
+        component.addLoginListener(e -> {
+            boolean isAuthenticated = authenticate(e);
+            if (isAuthenticated) {
+                // do nothing
+            } else {
+                component.setError(true);
+            }
+        });
+
+    }
+
+    private boolean authenticate(AbstractLogin.LoginEvent event) {
+        return event.getPassword().equalsIgnoreCase("password") && event.getUsername().equalsIgnoreCase("username");
     }
 }
