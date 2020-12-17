@@ -1,5 +1,6 @@
 package be.juvo.paul.formpractice;
 
+import be.juvo.paul.formpractice.forms.BinderUserForm;
 import be.juvo.paul.formpractice.forms.GreeterForm;
 import be.juvo.paul.formpractice.forms.ProductForm;
 import be.juvo.paul.formpractice.forms.ToDoForm;
@@ -31,16 +32,22 @@ public class MainView extends VerticalLayout {
 
     @Autowired
     private GreeterForm greeterForm;
+    @Autowired
+    private BinderUserForm binderUserForm;
 
     /**
      * Construct a new Vaadin view.
      * <p>
      * Build the initial UI state for the user accessing the application.
      */
-    public MainView(GreeterForm greeterForm) {
+    public MainView(
+            GreeterForm greeterForm,
+            BinderUserForm binderUserForm
+    ) {
         this.greeterForm = greeterForm;
+        this.binderUserForm = binderUserForm;
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(new ProductForm(), new ToDoForm());
+        horizontalLayout.add(binderUserForm, new ProductForm(), new ToDoForm());
 
         add(greeterForm, horizontalLayout);
     }
