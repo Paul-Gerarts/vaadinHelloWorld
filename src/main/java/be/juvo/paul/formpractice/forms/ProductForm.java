@@ -2,6 +2,7 @@ package be.juvo.paul.formpractice.forms;
 
 import be.juvo.paul.formpractice.customcomponents.CustomAccordion;
 import be.juvo.paul.formpractice.customfields.CustomDateTimePicker;
+import be.juvo.paul.sfaupgrade.model.Customer;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -49,9 +50,10 @@ public class ProductForm extends VerticalLayout {
         add(new DatePicker("Available"));
 
         // combination of listBox and textField, in which you can type for a value to select it
-        ComboBox<String> category = new ComboBox<>("Category");
-        category.setItems("A", "B", "C");
+        ComboBox<Customer> category = new ComboBox<>("Customers");
+        category.setItems(Customer.getDummyCustomers());
         category.setPreventInvalidInput(true);
+        category.setItemLabelGenerator(Customer::getName);
         add(category);
 
         Button save = new Button("Save");

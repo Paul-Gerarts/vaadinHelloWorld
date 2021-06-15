@@ -1,29 +1,34 @@
 package be.juvo.paul.formpractice;
 
+import be.juvo.paul.sfaupgrade.view.SfaUpgradeView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("layout_view")
 public class AppLayOutView extends AppLayout {
 
-    public AppLayOutView() {
+    @Autowired
+    private SfaUpgradeView sfaView;
+
+    public AppLayOutView(SfaUpgradeView sfaView) {
+        this.sfaView = sfaView;
+
         setPrimarySection(AppLayout.Section.DRAWER);
         Image img = new Image("https://i.imgur.com/GPpnszs.png", "Vaadin Logo");
         img.setHeight("44px");
         addToNavbar(new DrawerToggle(), img);
-        Tabs tabs = new Tabs(new Tab("Home"), new Tab("About"));
+        Tab sfaUpgrade = new Tab("SFA upgrade tryout");
+        sfaUpgrade.add(sfaView);
+        Tabs tabs = new Tabs(sfaUpgrade);
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         addToDrawer(tabs);
 
-        FormLayout nameLayout = new FormLayout();
+        /*FormLayout nameLayout = new FormLayout();
         TextField titleField = new TextField();
         titleField.setLabel("Title");
         titleField.setPlaceholder("Sir");
@@ -45,6 +50,6 @@ public class AppLayOutView extends AppLayout {
                 new Label("First content component"),
                 new Label("Second content component"));
 
-        addToDrawer(layout);
+        addToDrawer(layout);*/
     }
 }
